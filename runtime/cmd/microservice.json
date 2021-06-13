@@ -1,0 +1,106 @@
+{
+  "name": "test",
+  "connectors": [
+    {
+      "type": 0,
+      "data": {
+        "name": "mypg",
+        "user": "postgres",
+        "password": "123456789",
+        "db": "postgres"
+      }
+    }
+  ],
+  "services": [
+    {
+      "name": "ListStudents",
+      "path": "/v1/student",
+      "method": "GET",
+      "steps": [
+        {
+          "type": 0,
+          "load": {
+            "type": 0,
+            "result_field": "getStudentLoad",
+            "pg_sql_load": {
+              "connection": "mypg",
+              "query": "SELECT * FROM students",
+              "args": []
+            }
+          }
+        }
+      ],
+      "response": "getStudentLoad",
+      "respnse_code": 200
+    },
+    {
+      "name": "GetStudent",
+      "path": "/v1/student/:id",
+      "request_body": "{\r\n  \"type\": \"object\",\r\n  \"properties\": {\r\n    \"id\": {\r\n      \"type\": \"string\"\r\n    }\r\n  }\r\n}",
+      "method": "GET",
+      "steps": [
+        {
+          "type": 0,
+          "load": {
+            "type": 0,
+            "result_field": "getStudentLoad",
+            "pg_sql_load": {
+              "connection": "mypg",
+              "query": "SELECT * FROM students where name=$1",
+              "args": [
+                "request.id"
+              ]
+            }
+          }
+        }
+      ],
+      "response": "getStudentLoad.0",
+      "respnse_code": 200
+    },
+    {
+      "name": "StoreStudent",
+      "path": "/v1/student",
+      "request_body": "{\r\n  \"type\": \"object\",\r\n  \"properties\": {\r\n    \"id\": {\r\n      \"type\": \"string\"\r\n    }\r\n  }\r\n}",
+      "method": "POST",
+      "steps": [
+        {
+          "type": 1,
+          "store": {
+            "type": 0,
+            "pg_sql_store": {
+              "connection": "mypg",
+              "query": "INSERT INTO students(name) values($1)",
+              "args": [
+                "request.name"
+              ]
+            }
+          }
+        }
+      ],
+      "respnse_code": 200
+    },
+    {
+      "name": "UpdateStudent",
+      "path": "/v1/student/:id",
+      "request_body": "{\r\n  \"type\": \"object\",\r\n  \"properties\": {\r\n    \"id\": {\r\n      \"type\": \"string\"\r\n    }\r\n  }\r\n}",
+      "method": "POST",
+      "steps": [
+        {
+          "type": 1,
+          "store": {
+            "type": 0,
+            "pg_sql_store": {
+              "connection": "mypg",
+              "query": "UPDATE students SET address=$1 WHERE name=$2",
+              "args": [
+                "request.address",
+                "request.id"
+              ]
+            }
+          }
+        }
+      ],
+      "respnse_code": 200
+    }
+  ]
+}

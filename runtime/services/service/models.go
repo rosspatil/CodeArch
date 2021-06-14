@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/Jeffail/gabs/v2"
+	"github.com/rosspatil/codearch/runtime/services/customcode"
 	"github.com/rosspatil/codearch/runtime/services/load"
 	"github.com/rosspatil/codearch/runtime/services/store"
 )
@@ -13,12 +14,14 @@ type T int
 const (
 	Load T = iota
 	Store
+	CustomCode
 )
 
 type Step struct {
-	Type  T           `json:"type,omitempty"`
-	Load  load.Load   `json:"load,omitempty"`
-	Store store.Store `json:"store,omitempty"`
+	Type        T                     `json:"type,omitempty"`
+	Load        load.Load             `json:"load,omitempty"`
+	Store       store.Store           `json:"store,omitempty"`
+	CustomeCode customcode.CustomCode `json:"custome_code,omitempty"`
 }
 
 type Service struct {

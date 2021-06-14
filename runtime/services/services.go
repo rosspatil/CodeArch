@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/rosspatil/codearch/customcode"
 	"github.com/rosspatil/codearch/runtime/connectors"
 	"github.com/rosspatil/codearch/runtime/services/service"
 )
@@ -39,6 +40,7 @@ func Init(ctx context.Context, path string) {
 	for _, s := range ms.Services {
 		service.Register(ctx, g, s)
 	}
+	customcode.LoadMe()
 	if ms.Port == "" {
 		ms.Port = "8080"
 	}

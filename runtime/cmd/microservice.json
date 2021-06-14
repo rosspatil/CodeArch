@@ -101,6 +101,21 @@
         }
       ],
       "respnse_code": 200
+    },
+    {
+      "name": "CustomCode",
+      "path": "/v1/student",
+      "method": "DELETE",
+      "steps": [
+        {
+          "type": 2,
+          "custome_code": {
+            "function_name": "Test",
+            "data": "package main\r\n\r\nimport (\r\n\t\"context\"\r\n\t\"fmt\"\r\n\r\n\t\"github.com\/Jeffail\/gabs\/v2\"\r\n)\r\n\r\nfunc Test(ctx context.Context, c *gabs.Container) error {\r\n\tfmt.Println(\"Hello world\")\r\n\treturn nil\r\n}\r\n"
+          }
+        }
+      ],
+      "respnse_code": 200
     }
   ]
 }

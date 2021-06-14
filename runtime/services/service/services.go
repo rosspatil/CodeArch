@@ -80,6 +80,11 @@ func (s Service) Execute(ctx context.Context, req interface{}) (interface{}, err
 			if err != nil {
 				return nil, err
 			}
+		case CustomCode:
+			err := step.CustomeCode.Execute(ctx, s.m)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 	return s.m.Path(s.Response).Data(), nil

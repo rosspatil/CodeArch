@@ -1,0 +1,16 @@
+package customcode
+
+import (
+	"github.com/rosspatil/codearch/runtime/services/customcode"
+	{{range $key,$val := .packages}}
+	"github.com/rosspatil/codearch/customcode/{{$key}}"
+	{{end}}
+)
+
+func init() {
+	customcode.Compiler()
+	{{range $key,$val := .packages}}
+	customcode.RegisterCustomCode("{{$val}}", {{$key}}.{{$val}})
+	{{end}}
+}
+

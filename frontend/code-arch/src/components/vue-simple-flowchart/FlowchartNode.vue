@@ -8,6 +8,7 @@
     :class="{ selected: options.selected === id }"
   >
     <div
+      v-if="showTopPort"
       class="node-port node-input"
       @mousedown="inputMouseDown"
       @mouseup="inputMouseUp"
@@ -16,8 +17,12 @@
       <div v-text="type" class="node-type"></div>
       <div v-text="label" class="node-label"></div>
     </div>
-    <div class="node-port node-output" @mousedown="outputMouseDown"></div>
-    <div v-show="show.delete" class="node-delete">X</div>
+    <div
+      v-if="showBottomPort"
+      class="node-port node-output"
+      @mousedown="outputMouseDown"
+    ></div>
+    <div v-show="show.delete && type != 'internal'" class="node-delete">X</div>
   </div>
 </template>
 
@@ -74,6 +79,18 @@ export default {
   },
   mounted() {},
   computed: {
+    showTopPort() {
+      if (this.label === "request") {
+        return false;
+      }
+      return true;
+    },
+    showBottomPort() {
+      if (this.label === "response") {
+        return false;
+      }
+      return true;
+    },
     nodeStyle() {
       return {
         top: this.options.centerY + this.y * this.options.scale + "px", // remove: this.options.offsetTop +

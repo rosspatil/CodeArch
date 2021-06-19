@@ -7,7 +7,7 @@
           >Save</CButton
         >
         <CButton
-          @click="darkModal = true"
+          @click="showAddComponentModal"
           class="float-right"
           size="lg"
           color="info"
@@ -63,21 +63,29 @@
     >
       <CCard>
         <CCardBody>
-          <CSelect
-            label="Component"
-            size="lg"
-            horizontal
-            placeholder="Please select component"
-            :options="['load', 'store', 'custom code']"
-          />
+          <CForm>
+            <CInput
+              label="Name"
+              size="lg"
+              v-model="newComponentName"
+              placeholder="Name your component"
+            />
+            <CSelect
+              :value.sync="selectedComponent"
+              size="lg"
+              label="Component"
+              placeholder="Please select component"
+              :options="['load', 'store', 'code']"
+            />
+          </CForm>
         </CCardBody>
       </CCard>
       <template #header>
-        <h6 class="modal-title">Custom smaller modal title</h6>
+        <h6 class="modal-title">Choose Component</h6>
         <CButtonClose @click="darkModal = false" class="text-white" />
       </template>
       <template #footer>
-        <CButton @click="darkModal = false" color="success">Add</CButton>
+        <CButton @click="addNode" color="success">Add</CButton>
       </template>
     </CModal>
   </div>
@@ -93,41 +101,41 @@ export default {
   mounted() {},
   data() {
     return {
+      newComponentName: "",
+      selectedComponent: "",
       darkModal: false,
-      labelTxt: {
-        labelOn: "Auto",
-        labelOff: "Manual",
-      },
       scene: {
         centerX: 1024,
         centerY: 140,
         scale: 1,
         nodes: [
           {
-            id: 2,
+            id: -1,
             x: -812,
             y: -138,
             type: "internal",
             label: "request",
           },
           {
-            id: 3,
-            x: -700,
-            y: -138,
+            id: -2,
+            x: -812,
+            y: 207,
             type: "internal",
-            label: "request",
+            label: "response",
           },
         ],
         links: [],
       },
-      newNodeType: 0,
-      newNodeLabel: "",
-      nodeCategory: ["rule", "action", "script", "decision", "fork", "join"],
     };
   },
   methods: {
+    showAddComponentModal() {
+      this.newComponentName = "";
+      this.selectedComponent = "";
+      this.darkModal = true;
+    },
     canvasClick(e) {
-      console.log("canvas Click, event:", e);
+      // console.log("canvas Click, event:", e);
     },
     addNode() {
       let maxID = Math.max(
@@ -138,25 +146,28 @@ export default {
       );
       this.scene.nodes.push({
         id: maxID + 1,
-        x: -400,
-        y: 50,
-        type: this.nodeCategory[this.newNodeType],
-        label: this.newNodeLabel ? this.newNodeLabel : `test${maxID + 1}`,
+        x: -665,
+        y: -138,
+        type: this.selectedComponent,
+        label: this.newComponentName,
       });
+      this.selectedComponent = "";
+      this.newComponentName = "";
+      this.darkModal = false;
     },
     nodeClick(id) {
-      console.log(JSON.stringify(this.scene));
-      console.log("node click", id);
+      // console.log(JSON.stringify(this.scene));
+      // console.log("node click", id);
     },
     nodeDelete(id) {
-      console.log(JSON.stringify(this.scene));
-      console.log("node delete", id);
+      // console.log(JSON.stringify(this.scene));
+      // console.log("node delete", id);
     },
     linkBreak(id) {
-      console.log("link break", id);
+      // console.log("link break", id);
     },
     linkAdded(link) {
-      console.log("new link added:", link);
+      // console.log("new link added:", link);
     },
   },
 };

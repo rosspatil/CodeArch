@@ -262,6 +262,9 @@ export default {
       let index = this.scene.nodes.findIndex((item) => {
         return item.id === this.action.dragging;
       });
+      if (this.scene.nodes[index].label === "request") {
+        return;
+      }
       let left = this.scene.nodes[index].x + dx / this.scene.scale;
       let top = this.scene.nodes[index].y + dy / this.scene.scale;
       this.$set(

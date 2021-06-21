@@ -3,8 +3,8 @@ package store
 import (
 	"context"
 
-	"github.com/Jeffail/gabs/v2"
 	"github.com/rosspatil/codearch/runtime/connectors"
+	"github.com/rosspatil/codearch/runtime/models"
 	"github.com/rosspatil/codearch/runtime/utils"
 )
 
@@ -14,7 +14,7 @@ type PgSQLStore struct {
 	Args       []string `json:"args,omitempty"`
 }
 
-func (l *PgSQLStore) Execute(ctx context.Context, c *gabs.Container) error {
+func (l *PgSQLStore) Execute(ctx context.Context, c *models.Controller) error {
 	db, err := connectors.GetPgSQLConnection(l.Connection)
 	if err != nil {
 		return err

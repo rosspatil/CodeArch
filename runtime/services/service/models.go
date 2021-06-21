@@ -3,7 +3,8 @@ package service
 import (
 	"context"
 
-	"github.com/Jeffail/gabs/v2"
+	"github.com/rosspatil/codearch/runtime/models"
+	"github.com/rosspatil/codearch/runtime/services/condition"
 	"github.com/rosspatil/codearch/runtime/services/customcode"
 	"github.com/rosspatil/codearch/runtime/services/load"
 	"github.com/rosspatil/codearch/runtime/services/store"
@@ -15,6 +16,7 @@ const (
 	Load T = iota
 	Store
 	CustomCode
+	Condition
 )
 
 type Step struct {
@@ -22,6 +24,7 @@ type Step struct {
 	Load        load.Load             `json:"load,omitempty"`
 	Store       store.Store           `json:"store,omitempty"`
 	CustomeCode customcode.CustomCode `json:"custome_code,omitempty"`
+	Condition   condition.Condition   `json:"condition,omitempty"`
 }
 
 type Service struct {
@@ -32,9 +35,9 @@ type Service struct {
 	Steps       []Step `json:"steps,omitempty"`
 	Response    string `json:"response,omitempty"`
 	RespnseCode int    `json:"respnse_code,omitempty"`
-	m           *gabs.Container
+	m           *models.Controller
 }
 
 type Exce interface {
-	Executor(context.Context, *gabs.Container) error
+	Executor(context.Context, *models.Controller) error
 }

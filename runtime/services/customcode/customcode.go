@@ -4,7 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/Jeffail/gabs/v2"
+	"github.com/rosspatil/code-arch/types"
+	"github.com/rosspatil/codearch/runtime/models"
 )
 
 type CustomCode struct {
@@ -21,10 +22,9 @@ func RegisterCustomCode(name string, fn CodeFn) {
 	customCodeRegistry[name] = fn
 }
 
-type CodeFn func(ctx context.Context, c *gabs.Container) error
+type CodeFn func(ctx context.Context, c types.Controller) error
 
-func (l *CustomCode) Execute(ctx context.Context, c *gabs.Container) error {
-	fmt.Println("Executing BL", customCodeRegistry)
+func (l *CustomCode) Execute(ctx context.Context, c *models.Controller) error {
 	fn, ok := customCodeRegistry[l.FunctionName]
 	if !ok {
 		return fmt.Errorf("no CustomCode found for %s", l.FunctionName)

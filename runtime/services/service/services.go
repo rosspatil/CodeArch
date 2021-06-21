@@ -9,6 +9,7 @@ import (
 
 	"github.com/Jeffail/gabs/v2"
 	"github.com/gin-gonic/gin"
+	"github.com/rosspatil/codearch/runtime/models"
 )
 
 func Register(ctx context.Context, g *gin.Engine, s Service) {
@@ -66,7 +67,8 @@ func (s Service) Execute(ctx context.Context, req interface{}) (interface{}, err
 	if err != nil {
 		return nil, err
 	}
-	s.m = gabs.New()
+	s.m = new(models.Controller)
+	s.m.Container = gabs.New()
 	s.m.SetP(req, "request")
 	for _, step := range s.Steps {
 		switch step.Type {
@@ -82,6 +84,11 @@ func (s Service) Execute(ctx context.Context, req interface{}) (interface{}, err
 			}
 		case CustomCode:
 			err := step.CustomeCode.Execute(ctx, s.m)
+			if err != nil {
+				return nil, err
+			}
+		case Condition:
+			err := step.Condition.Execute(ctx, s.m)
 			if err != nil {
 				return nil, err
 			}

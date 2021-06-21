@@ -3,8 +3,8 @@ package load
 import (
 	"context"
 
-	"github.com/Jeffail/gabs/v2"
 	"github.com/rosspatil/codearch/runtime/connectors"
+	"github.com/rosspatil/codearch/runtime/models"
 	"github.com/rosspatil/codearch/runtime/utils"
 )
 
@@ -14,7 +14,7 @@ type PgSQLLoad struct {
 	Args       []string `json:"args,omitempty"`
 }
 
-func (l *PgSQLLoad) Execute(ctx context.Context, c *gabs.Container) ([]interface{}, error) {
+func (l *PgSQLLoad) Execute(ctx context.Context, c *models.Controller) ([]interface{}, error) {
 	rs := []interface{}{}
 	db, err := connectors.GetPgSQLConnection(l.Connection)
 	if err != nil {

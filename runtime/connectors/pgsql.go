@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	_ "github.com/lib/pq"
+	"github.com/rosspatil/codearch/runtime/utils"
 )
 
 type pgsqlConnectors map[string]*sql.DB
@@ -26,6 +27,9 @@ type PGSQL struct {
 }
 
 func (m *PGSQL) ConnectionString() string {
+	m.User, _ = utils.ResolveEnvironmentVariable(m.User)
+	m.Password, _ = utils.ResolveEnvironmentVariable(m.Password)
+	m.DB, _ = utils.ResolveEnvironmentVariable(m.DB)
 	return fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable", m.User, m.Password, m.DB)
 }
 

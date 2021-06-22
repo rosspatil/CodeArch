@@ -6,116 +6,119 @@
       "data": {
         "name": "mypg",
         "user": "postgres",
-        "password": "123456789",
-        "db": "postgres"
+        "password": "${pg_password:-postgres}",
+        "db": "postgres",
+        "port": "5432",
+        "host": "${pg_host:-localhost}"
       }
     }
   ],
   "services": [
     {
-      "name": "ListStudents",
-      "path": "/v1/student",
-      "method": "GET",
-      "steps": [
-        {
-          "type": 0,
-          "load": {
-            "type": 0,
-            "result_field": "getStudentLoad",
-            "pg_sql_load": {
-              "connection": "mypg",
-              "query": "SELECT * FROM students",
-              "args": []
-            }
-          }
-        }
-      ],
-      "response": "getStudentLoad",
-      "respnse_code": 200
-    },
-    {
-      "name": "GetStudent",
-      "path": "/v1/student/:id",
-      "request_body": "{\r\n  \"type\": \"object\",\r\n  \"properties\": {\r\n    \"id\": {\r\n      \"type\": \"string\"\r\n    }\r\n  }\r\n}",
-      "method": "GET",
-      "steps": [
-        {
-          "type": 0,
-          "load": {
-            "type": 0,
-            "result_field": "getStudentLoad",
-            "pg_sql_load": {
-              "connection": "mypg",
-              "query": "SELECT * FROM students where name=$1",
-              "args": [
-                "request.id"
-              ]
-            }
-          }
-        }
-      ],
-      "response": "getStudentLoad.0",
-      "respnse_code": 200
-    },
-    {
-      "name": "StoreStudent",
-      "path": "/v1/student",
-      "request_body": "{\r\n  \"type\": \"object\",\r\n  \"properties\": {\r\n    \"id\": {\r\n      \"type\": \"string\"\r\n    }\r\n  }\r\n}",
+      "name": "Registration",
+      "path": "/v1/register",
       "method": "POST",
+      "override_errors": [
+        {
+          "http_code": 400,
+          "message": "User already register",
+          "expression": "pq: duplicate key value violates unique constraint \"users_pkey\""
+        }
+      ],
       "steps": [
+        {
+          "type": 4,
+          "crypto": {
+            "result_field": "request.password",
+            "type": 1,
+            "hashing_with_salt": {
+              "field": "request.password",
+              "salt": "supersecretkey"
+            }
+          }
+        },
         {
           "type": 1,
           "store": {
             "type": 0,
             "pg_sql_store": {
               "connection": "mypg",
-              "query": "INSERT INTO students(name) values($1)",
+              "query": "INSERT INTO users(name,email,password) values($1,$2,$3)",
               "args": [
-                "request.name"
+                "request.name",
+                "request.email",
+                "request.password"
               ]
             }
           }
         }
       ],
-      "respnse_code": 200
+      "response": {
+        "http_code": 204,
+        "field": ""
+      }
     },
     {
-      "name": "UpdateStudent",
-      "path": "/v1/student/:id",
-      "request_body": "{\r\n  \"type\": \"object\",\r\n  \"properties\": {\r\n    \"id\": {\r\n      \"type\": \"string\"\r\n    }\r\n  }\r\n}",
+      "name": "Login",
+      "path": "/v1/login",
       "method": "POST",
+      "override_errors": [],
       "steps": [
         {
-          "type": 1,
-          "store": {
+          "type": 4,
+          "crypto": {
+            "result_field": "request.password",
+            "type": 1,
+            "hashing_with_salt": {
+              "field": "request.password",
+              "salt": "supersecretkey"
+            }
+          }
+        },
+        {
+          "type": 0,
+          "load": {
             "type": 0,
-            "pg_sql_store": {
+            "result_field": "user",
+            "pg_sql_load": {
               "connection": "mypg",
-              "query": "UPDATE students SET address=$1 WHERE name=$2",
+              "query": "SELECT id, name,email,created_at FROM users WHERE email=$1 AND password=$2",
               "args": [
-                "request.address",
-                "request.id"
+                "request.email",
+                "request.password"
               ]
+            },
+            "custom_errors": [
+              {
+                "http_code": 404,
+                "expression": "arrayLen(resolve(\"user\")) == 0",
+                "message": "Invalid Credentials"
+              }
+            ]
+          }
+        },
+        {
+          "type": 4,
+          "crypto": {
+            "type": 2,
+            "result_field": "response.headers.authorization",
+            "jwt_encode": {
+              "key": "${jwt_key:-mysupersecretkey}",
+              "alg": "HS256",
+              "claim": {
+                "id": "user.0.id"
+              }
             }
           }
         }
       ],
-      "respnse_code": 200
-    },
-    {
-      "name": "CustomCode",
-      "path": "/v1/student",
-      "method": "DELETE",
-      "steps": [
-        {
-          "type": 2,
-          "custome_code": {
-            "function_name": "Test",
-            "data": "package main\r\n\r\nimport (\r\n\t\"context\"\r\n\t\"fmt\"\r\n\r\n\t\"github.com\/Jeffail\/gabs\/v2\"\r\n)\r\n\r\nfunc Test(ctx context.Context, c *gabs.Container) error {\r\n\tfmt.Println(\"Hello world\")\r\n\treturn nil\r\n}\r\n"
-          }
+      "response": {
+        "http_code": 200,
+        "field": "user",
+        "headers": {
+          "authorization": "response.headers.authorization"
         }
-      ],
-      "respnse_code": 200
+      }
     }
   ]
 }

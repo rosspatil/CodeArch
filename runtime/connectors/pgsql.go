@@ -20,21 +20,25 @@ func init() {
 }
 
 type PGSQL struct {
-	Name     string `json:"name"`
-	User     string `json:"user"`
-	Password string `json:"password"`
-	DB       string `json:"db"`
+	Name     string `json:"name,omitempty"`
+	User     string `json:"user,omitempty"`
+	Password string `json:"password,omitempty"`
+	DB       string `json:"db,omitempty"`
+	Host     string `json:"host,omitempty"`
+	Port     string `json:"port,omitempty"`
 }
 
 func (m *PGSQL) ConnectionString() string {
 	m.User, _ = utils.ResolveEnvironmentVariable(m.User)
 	m.Password, _ = utils.ResolveEnvironmentVariable(m.Password)
 	m.DB, _ = utils.ResolveEnvironmentVariable(m.DB)
-	return fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable", m.User, m.Password, m.DB)
+	m.Host, _ = utils.ResolveEnvironmentVariable(m.Host)
+	m.Port, _ = utils.ResolveEnvironmentVariable(m.Port)
+	fmt.Println(fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s  sslmode=disable", m.User, m.Password, m.DB, m.Host, m.Port))
+	return fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s  sslmode=disable", m.User, m.Password, m.DB, m.Host, m.Port)
 }
 
 func InitPgSQL(ctx context.Context, m *PGSQL) error {
-	fmt.Println("here in pgsql connector")
 	db, err := sql.Open("postgres", m.ConnectionString())
 	if err != nil {
 		return err

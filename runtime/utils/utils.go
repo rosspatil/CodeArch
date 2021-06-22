@@ -34,7 +34,12 @@ func ResolveValues(keys []string, c *models.Controller) []interface{} {
 func ResolveEnvironmentVariable(str string) (string, bool) {
 	if EnvRegex.MatchString(str) {
 		str = extractEnvVariable(str)
-		return os.Getenv(str), true
+		tokens := strings.Split(str, ":-")
+		tmp := os.Getenv(str)
+		if tmp == "" && len(tokens) > 0 {
+			tmp = tokens[1]
+		}
+		return tmp, true
 	}
 	return str, false
 }

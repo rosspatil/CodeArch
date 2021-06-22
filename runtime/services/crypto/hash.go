@@ -11,24 +11,23 @@ import (
 )
 
 type Hashing struct {
-	Fields string
+	Field string `json:"field,omitempty"`
 }
 
 func (h *Hashing) Exceute(ctx context.Context, c *models.Controller) (interface{}, error) {
-	value := utils.ResolveValue(h.Fields, c)
+	value := utils.ResolveValue(h.Field, c)
 	return fmt.Sprintf("%x", md5.New().Sum([]byte(value.(string)))), nil
 }
 
 type HashingWithSalt struct {
-	Fields string
-	Salt   string
+	Field string `json:"field,omitempty"`
+	Salt  string `json:"salt,omitempty"`
 }
 
 func (h *HashingWithSalt) Exceute(ctx context.Context, c *models.Controller) (interface{}, error) {
-	fieldVal := utils.ResolveValue(h.Fields, c)
-	saltVal := utils.ResolveValue(h.Salt, c)
+	fieldVal := utils.ResolveValue(h.Field, c)
 	field := []byte(fieldVal.(string))
-	salt := []byte(saltVal.(string))
+	salt := []byte(h.Salt)
 	field = append(field, salt...)
 	field = sha512.New().Sum(field)
 	return fmt.Sprintf("%x", field), nil

@@ -24,10 +24,12 @@ type crypto interface {
 }
 
 type Crypto struct {
-	Type            T
-	ResultField     string
-	Hash            Hashing
-	HashingWithSalt HashingWithSalt
+	Type            T               `json:"type,omitempty"`
+	ResultField     string          `json:"result_field,omitempty"`
+	Hash            Hashing         `json:"hash,omitempty"`
+	HashingWithSalt HashingWithSalt `json:"hashing_with_salt,omitempty"`
+	JWTEncode       JWTEncoding     `json:"jwt_encode,omitempty"`
+	JWTDecode       JWTDecoding     `json:"jwt_decode,omitempty"`
 }
 
 func (l *Crypto) Execute(ctx context.Context, m *models.Controller) error {
@@ -40,10 +42,16 @@ func (l *Crypto) Execute(ctx context.Context, m *models.Controller) error {
 		data, err = l.Hash.Exceute(ctx, m)
 	case HashWithSALT:
 		data, err = l.HashingWithSalt.Exceute(ctx, m)
+	case JWTEncode:
+		data, err = l.JWTEncode.Exceute(ctx, m)
+	case JWTDecode:
+		err = l.JWTDecode.Exceute(ctx, m)
 	}
 	if err != nil {
 		return err
 	}
-	m.SetP(data, l.ResultField)
+	if data != nil {
+		m.SetP(data, l.ResultField)
+	}
 	return nil
 }

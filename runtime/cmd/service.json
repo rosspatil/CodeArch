@@ -1,0 +1,288 @@
+{
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "path": {
+      "type": "string"
+    },
+    "method": {
+      "type": "string"
+    },
+    "request_body": {
+      "type": "string"
+    },
+    "response": {
+      "type": "object",
+      "properties": {
+        "http_code": {
+          "type": "integer"
+        },
+        "field": {
+          "type": "string"
+        },
+        "headers": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "http_code",
+        "field"
+      ]
+    },
+    "override_errors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "http_code": {
+            "type": "integer"
+          },
+          "message": {
+            "type": "string"
+          },
+          "expression": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "http_code",
+          "message",
+          "expression"
+        ]
+      }
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "integer"
+          },
+          "load": {
+            "type": "object",
+            "required": [
+              "type",
+              "result_field"
+            ],
+            "properties": {
+              "type": {
+                "type": "integer"
+              },
+              "result_field": {
+                "type": "string"
+              },
+              "pg_sql_load": {
+                "required": [
+                  "connection",
+                  "query"
+                ],
+                "type": "object",
+                "properties": {
+                  "connection": {
+                    "type": "string"
+                  },
+                  "query": {
+                    "type": "string"
+                  },
+                  "args": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "custom_errors": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "http_code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "expression": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "http_code",
+                    "message",
+                    "expression"
+                  ]
+                }
+              }
+            }
+          },
+          "store": {
+            "type": "object",
+            "required": [
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "integer"
+              },
+              "pg_sql_store": {
+                "required": [
+                  "connection",
+                  "query"
+                ],
+                "type": "object",
+                "properties": {
+                  "connection": {
+                    "type": "string"
+                  },
+                  "query": {
+                    "type": "string"
+                  },
+                  "args": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "custome_code": {
+            "type": "object",
+            "required": [
+              "function_name",
+              "data"
+            ],
+            "properties": {
+              "function_name": {
+                "type": "string"
+              },
+              "data": {
+                "type": "string"
+              }
+            }
+          },
+          "condition": {
+            "type": "object",
+            "required": [
+              "query",
+              "result_field"
+            ],
+            "properties": {
+              "query": {
+                "type": "string"
+              },
+              "args": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "result_field": {
+                "type": "string"
+              }
+            }
+          },
+          "crypto": {
+            "required": [
+              "type"
+            ],
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "integer"
+              },
+              "result_field": {
+                "type": "string"
+              },
+              "hash": {
+                "required": [
+                  "field"
+                ],
+                "type": "object",
+                "properties": {
+                  "field": {
+                    "type": "string"
+                  }
+                }
+              },
+              "hashing_with_salt": {
+                "required": [
+                  "field",
+                  "salt"
+                ],
+                "type": "object",
+                "properties": {
+                  "field": {
+                    "type": "string"
+                  },
+                  "salt": {
+                    "type": "string"
+                  }
+                }
+              },
+              "jwt_encode": {
+                "type": "object",
+                "required": [
+                  "key",
+                  "alg",
+                  "result_field"
+                ],
+                "properties": {
+                  "key": {
+                    "type": "string"
+                  },
+                  "iss": {
+                    "type": "string"
+                  },
+                  "sub": {
+                    "type": "string"
+                  },
+                  "aud": {
+                    "type": "string"
+                  },
+                  "exp": {
+                    "type": "integer"
+                  },
+                  "alg": {
+                    "type": "string"
+                  },
+                  "claim": {
+                    "type": "object"
+                  },
+                  "result_field": {
+                    "type": "string"
+                  }
+                }
+              },
+              "jwt_decode": {
+                "type": "object",
+                "required": [
+                  "key",
+                  "field"
+                ],
+                "properties": {
+                  "key": {
+                    "type": "string"
+                  },
+                  "field": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "name",
+    "path",
+    "method"
+  ]
+}

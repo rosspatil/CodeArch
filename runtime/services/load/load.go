@@ -18,17 +18,24 @@ type load interface {
 }
 
 type Load struct {
-	Type        T                        `json:"type,omitempty"`
-	ResultField string                   `json:"result_field,omitempty"`
-	PgSQLLoad   PgSQLLoad                `json:"pg_sql_load,omitempty"`
-	CutomErrors customerrors.CutomErrors `json:"cutom_errors,omitempty"`
+	Type         T                        `json:"type,omitempty"`
+	ResultField  string                   `json:"result_field,omitempty"`
+	PgSQLLoad    PgSQLLoad                `json:"pg_sql_load,omitempty"`
+	CustomErrors customerrors.CutomErrors `json:"custom_errors,omitempty"`
 }
 
 func (l *Load) Execute(ctx context.Context, m *models.Controller) error {
-	data, err := l.PgSQLLoad.Execute(ctx, m)
+	var (
+		data interface{}
+		err  error
+	)
+	switch l.Type {
+	case PgSQL:
+		data, err = l.PgSQLLoad.Execute(ctx, m)
+	}
 	if err != nil {
 		return err
 	}
 	m.SetP(data, l.ResultField)
-	return nil
+	return l.CustomErrors.Execute(ctx, m)
 }

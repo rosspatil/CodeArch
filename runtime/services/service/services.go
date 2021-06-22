@@ -6,10 +6,13 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 
 	"github.com/Jeffail/gabs/v2"
 	"github.com/gin-gonic/gin"
 	"github.com/rosspatil/codearch/runtime/models"
+	"github.com/rosspatil/codearch/runtime/services/customerrors"
+	"github.com/rosspatil/codearch/runtime/utils"
 )
 
 func Register(ctx context.Context, g *gin.Engine, s Service) {
@@ -27,9 +30,14 @@ func Register(ctx context.Context, g *gin.Engine, s Service) {
 
 func Handler(ctx context.Context, s Service, readBody bool) func(*gin.Context) {
 	return func(c *gin.Context) {
+		s.m = new(models.Controller)
+		s.m.Container = gabs.New()
 		m := map[string]interface{}{}
 		extractPathParams(c, m)
 		extractQueryParams(c, m)
+		for k, v := range c.Request.Header {
+			s.m.SetP(fmt.Sprintf("request.headers.%s", strings.ToLower(k)), v[0])
+		}
 		if readBody {
 			ba, err := ioutil.ReadAll(c.Request.Body)
 			if err == nil {
@@ -42,11 +50,15 @@ func Handler(ctx context.Context, s Service, readBody bool) func(*gin.Context) {
 		}
 		resp, err := s.Execute(ctx, m)
 		if err != nil {
+			err = s.OverrideErrors.Execute(ctx, s.m, err)
 			fmt.Println(err)
-			c.JSONP(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			c.JSONP(customerrors.ErrorResponse(err))
 			return
 		}
-		c.JSONP(s.RespnseCode, resp)
+		for k, v := range s.Response.Headers {
+			c.Header(k, fmt.Sprint(utils.ResolveValue(v, s.m)))
+		}
+		c.JSONP(s.Response.HttpCode, resp)
 	}
 }
 
@@ -67,32 +79,24 @@ func (s Service) Execute(ctx context.Context, req interface{}) (interface{}, err
 	if err != nil {
 		return nil, err
 	}
-	s.m = new(models.Controller)
-	s.m.Container = gabs.New()
+
 	s.m.SetP(req, "request")
 	for _, step := range s.Steps {
 		switch step.Type {
 		case Load:
-			err := step.Load.Execute(ctx, s.m)
-			if err != nil {
-				return nil, err
-			}
+			err = step.Load.Execute(ctx, s.m)
 		case Store:
-			err := step.Store.Execute(ctx, s.m)
-			if err != nil {
-				return nil, err
-			}
+			err = step.Store.Execute(ctx, s.m)
 		case CustomCode:
-			err := step.CustomeCode.Execute(ctx, s.m)
-			if err != nil {
-				return nil, err
-			}
+			err = step.CustomeCode.Execute(ctx, s.m)
 		case Condition:
-			err := step.Condition.Execute(ctx, s.m)
-			if err != nil {
-				return nil, err
-			}
+			err = step.Condition.Execute(ctx, s.m)
+		case Crypto:
+			err = step.Crypto.Execute(ctx, s.m)
+		}
+		if err != nil {
+			return nil, err
 		}
 	}
-	return s.m.Path(s.Response).Data(), nil
+	return s.m.Path(s.Response.Field).Data(), nil
 }

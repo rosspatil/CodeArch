@@ -4,7 +4,11 @@ Vue.use(Vuex)
 
 const state = {
   sidebarShow: 'responsive',
-  sidebarMinimize: false
+  sidebarMinimize: false,
+  editor: {
+    currentComponentId: 0,
+    components: []
+  }
 }
 
 const mutations = {
@@ -18,7 +22,11 @@ const mutations = {
   },
   set (state, [variable, value]) {
     state[variable] = value
+  },
+  setCurrentComponent (state, id) {
+    state.editor.currentComponentId = id
   }
+
 }
 
 export default new Vuex.Store({

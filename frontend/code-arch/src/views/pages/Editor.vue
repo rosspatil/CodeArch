@@ -28,7 +28,8 @@
         />
       </CCol>
       <CCol lg="6" class="editor-form">
-        <CCard>
+        <EditorComponent></EditorComponent>
+        <!-- <CCard>
           <CCardHeader>
             <strong>Company </strong><small>Form</small>
           </CCardHeader>
@@ -50,7 +51,7 @@
             </CRow>
             <CInput label="Country" placeholder="Country name" />
           </CCardBody>
-        </CCard>
+        </CCard> -->
       </CCol>
     </CRow>
     <CModal
@@ -93,10 +94,12 @@
 
 <script>
 import SimpleFlowchart from "@/components/vue-simple-flowchart";
+import EditorComponent from "@/components/editor/EditorComponent";
 export default {
   name: "Editor",
   components: {
     SimpleFlowchart,
+    EditorComponent,
   },
   mounted() {},
   data() {
@@ -156,6 +159,8 @@ export default {
       this.darkModal = false;
     },
     nodeClick(id) {
+      console.log(id);
+      this.$store.commit("setCurrentComponent", id);
       // console.log(JSON.stringify(this.scene));
       // console.log("node click", id);
     },
